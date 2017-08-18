@@ -72,7 +72,6 @@ module Aliyun
         params['TextBody'] = textbody unless textbody.nil?
         params['ClickTrace'] = click_trace unless click_trace.nil?
         req.body = sign_result(access_key_secret, params)
-        p req.body.split('&')
         response = http.request(req)
         response
       rescue => e
