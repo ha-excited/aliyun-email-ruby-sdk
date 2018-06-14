@@ -9,16 +9,16 @@ include ERB::Util
 module Aliyun
   class Email
     attr_accessor :access_key_secret,
-                  :access_key_id,
-                  :action,
-                  :format,
-                  :region_id,
-                  :account_name,
-                  :signature_method,
-                  :reply_to_address,
-                  :address_type,
-                  :signature_version,
-                  :version
+      :access_key_id,
+      :action,
+      :format,
+      :region_id,
+      :account_name,
+      :signature_method,
+      :reply_to_address,
+      :address_type,
+      :signature_version,
+      :version
     def initialize(access_key_id, access_key_secret, account_name)
       # public args
       @access_key_secret = access_key_secret
@@ -39,26 +39,26 @@ module Aliyun
     def create_params(to_address)
       {
         # public args
-        'AccessKeyId'       => access_key_id,
-        'Format'            => format,
-        'RegionId'          => region_id,
-        'SignatureMethod'   => signature_method,
-        'SignatureVersion'  => signature_version,
-        'Version'           => version,
+        'AccessKeyId' => access_key_id,
+        'Format' => format,
+        'RegionId' => region_id,
+        'SignatureMethod' => signature_method,
+        'SignatureVersion' => signature_version,
+        'Version' => version,
 
-        'SignatureNonce'    => seed_signature_nonce,
-        'Timestamp'         => seed_timestamp,
+        'SignatureNonce' => seed_signature_nonce,
+        'Timestamp' => seed_timestamp,
 
         # function args
-        'Action'            => action,
-        'AccountName'       => account_name,
-        'ReplyToAddress'    => reply_to_address,
-        'AddressType'       => address_type,
-        'ToAddress'         => to_address
+        'Action' => action,
+        'AccountName' => account_name,
+        'ReplyToAddress' => reply_to_address,
+        'AddressType' => address_type,
+        'ToAddress' => to_address
       }
     end
 
-    def send(to_address, from_alias: nil, subject: nil, htmlbody: nil, textbody: nil, click_trace: nil)
+    def send(to_address:, subject:, body:, from_alias: nil, click_trace: nil, format: :text)
       begin
         uri = URI("https://dm.aliyuncs.com")
         header = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -68,8 +68,7 @@ module Aliyun
         params = create_params(to_address)
         params['FromAlias'] = from_alias unless from_alias.nil?
         params['Subject'] = subject unless subject.nil?
-        params['HtmlBody'] = htmlbody unless htmlbody.nil?
-        params['TextBody'] = textbody unless textbody.nil?
+        params[format == :text ? 'TextBody' : 'HtmlBody'] = body
         params['ClickTrace'] = click_trace unless click_trace.nil?
         req.body = sign_result(access_key_secret, params)
         response = http.request(req)
@@ -97,7 +96,7 @@ module Aliyun
     end
 
 
-    def compute_signature access_key_secret,canonicalized_query_string
+    def compute_signature access_key_secret, canonicalized_query_string
       string_to_sign = 'POST' + '&' + safe_encode('/') + '&' + safe_encode(canonicalized_query_string)
       signature = calculate_signature access_key_secret+"&", string_to_sign
     end
@@ -107,8 +106,7 @@ module Aliyun
     end
 
     def safe_encode value
-      URI.encode_www_form_component(value).gsub(/\+/,'%20').gsub(/\*/,'%2A').gsub(/%7E/,'~')
+      URI.encode_www_form_component(value).gsub(/\+/, '%20').gsub(/\*/, '%2A').gsub(/%7E/, '~')
     end
   end
 end
-

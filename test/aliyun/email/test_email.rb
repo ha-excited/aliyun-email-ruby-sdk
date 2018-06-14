@@ -4,7 +4,7 @@ require 'aliyun/email'
 require 'minitest/autorun'
 require 'yaml'
 
-class TestEmal < Minitest::Test
+class TestEmail < Minitest::Test
   def setup
     @config = YAML.load(File.open("test_config.yml"))
     @aliyun = Aliyun::Email.new(@config['access_key_id'],@config['access_key_secret'], @config['account_name'])
@@ -13,7 +13,6 @@ class TestEmal < Minitest::Test
     result = @aliyun.send(@config['to_address'],
                                 from_alias: @config['from_alias'],
                                 subject: @config['subject'],
-                                htmlbody: @config['htmlbody'],
                                 textbody: @config['textbody'],
                                 click_trace: @config['click_trace'])
     p result.body unless result.nil?
