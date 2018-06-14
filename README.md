@@ -5,6 +5,8 @@
 ### init
 
 ```
+require 'aliyun/email'
+
 aliyun = Aliyun::Email.new(@config['access_key_id'],@config['access_key_secret'], @config['account_name'])
 ```
 
